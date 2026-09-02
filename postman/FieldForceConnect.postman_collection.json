@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "FieldForceConnect - API Testing (Nimap QA Machine Test)",
+    "description": "Candidate: Vrushket Vivek Mulye\n\nCovers environment setup, auth-token variable chaining, Login (valid/invalid), and Add Customer API tests for https://test.fieldforceconnect.com/.\n\nIMPORTANT: The exact request paths/body fields below are PLACEHOLDERS. Open the site, use Chrome DevTools -> Network tab, perform Login and Add Customer manually in the browser, and copy the real endpoint URL + request payload into the corresponding requests here.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "Login - Valid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has auth token', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "    // Save token so subsequent requests (e.g. Add Customer) can reuse it",
+                  "    pm.environment.set('authToken', json.token);",
+                  "});",
+                  "",
+                  "pm.test('Response time is acceptable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiBasePath}}/login",
+              "host": ["{{baseUrl}}{{apiBasePath}}"],
+              "path": ["login"]
+            },
+            "description": "Replace the URL path and body keys with the real Login API found via DevTools Network tab while logging in manually on the site."
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code indicates auth failure (401/400)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403]);",
+                  "});",
+                  "",
+                  "pm.test('Response contains an error message', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json).toLowerCase()).to.include('invalid');",
+                  "});",
+                  "",
+                  "pm.test('No auth token is returned on failed login', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.token).to.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{invalidPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiBasePath}}/login",
+              "host": ["{{baseUrl}}{{apiBasePath}}"],
+              "path": ["login"]
+            },
+            "description": "Same endpoint as the valid-login request, but with a deliberately wrong password to validate negative-path behaviour and status codes."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Customer",
+      "item": [
+        {
+          "name": "Add Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 or 201', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Customer created successfully in response body', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json).toLowerCase()).to.include('success');",
+                  "});",
+                  "",
+                  "pm.test('Response contains the customer name submitted', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(JSON.stringify(json)).to.include(pm.environment.get('customerName'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{customerName}}\",\n  \"email\": \"{{customerEmail}}\",\n  \"phone\": \"{{customerPhone}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiBasePath}}/customer",
+              "host": ["{{baseUrl}}{{apiBasePath}}"],
+              "path": ["customer"]
+            },
+            "description": "Uses {{authToken}} captured automatically by the 'Login - Valid Credentials' request's test script. Replace URL path, header name (Authorization/Bearer vs custom token header), and body keys with the real Add Customer API found via DevTools."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
