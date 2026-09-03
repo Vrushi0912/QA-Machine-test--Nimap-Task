@@ -7,7 +7,6 @@ This repository is organized into three parts, matching the three sections of th
 
 ```
 nimap-qa-project/
-├── automation/        -> Maven + Selenium + TestNG framework (Login, Punch In toast, Add Customer)
 ├── manual-testing/     -> Manual_Test_Cases_FieldForceConnect.xlsx (Sign Up, Forgot Password, OTP, Login)
 └── postman/            -> Postman collection + environment + API testing guide
 ```
