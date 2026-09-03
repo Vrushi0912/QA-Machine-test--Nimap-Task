@@ -43,30 +43,4 @@ defects found on the Bug Report sheet.
 - `API_TESTING_GUIDE.md` — step-by-step on identifying the real Login/Add Customer API
   endpoints via Chrome DevTools, plus an explanation of the setup (per the evaluation criteria)
 
-## Next steps before submission
 
-1. Sign up on https://test.fieldforceconnect.com/ with your own email to get valid credentials.
-2. Inspect the real DOM/API and replace the placeholder locators/endpoints noted above.
-3. Execute the manual test cases and log any bugs found.
-4. Run the automation suite and the Postman collection; capture screenshots/reports if useful.
-5. Push to your GitHub repo (see commands below) and share the link before the
-   **04-Sept-26, 2 PM** deadline.
-
-## Pushing to GitHub
-
-```bash
-cd nimap-qa-project
-git init
-git add .
-git commit -m "Nimap QA machine test submission - Vrushket Vivek Mulye"
-git branch -M main
-git remote add origin https://github.com/Vrushi0912/QA-Machine-test--Nimap-Task.git
-git push -u origin main
-```
-
-If the repo already has a README/commit from creating it on GitHub, pull first to avoid a
-rejected push:
-```bash
-git pull origin main --allow-unrelated-histories
-git push -u origin main
-```
